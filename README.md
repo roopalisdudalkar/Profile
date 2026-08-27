@@ -1,48 +1,26 @@
 # Profile (Vite + React + TypeScript)
 
-This repository was scaffolded by an automated assistant into a Vite + React + TypeScript starter.
+This repository was scaffolded by an automated assistant into a Vite + React + TypeScript starter. I also added a simple built-in chatbot UI (client-side simulated bot) so you can interact without external APIs.
 
-What I changed in branch scaffold/vite-react-ts
+OpenAI integration (serverless proxy)
 
-- Added react-router with a simple two-route setup: Home and About.
-- Added a typed UserContext (React Context + hook) to hold profile data and allow in-app edits.
-- Moved the single-file UI into a Home page and kept a small About page.
-- Updated package.json to include react-router-dom.
+I added a Vercel serverless function at `api/chat` that forwards user prompts to OpenAI's Chat Completions API. To enable it in production, add the following environment variable to your Vercel project:
 
-How to run locally
+- `OPENAI_API_KEY` — your OpenAI API key (do NOT commit this to the repository)
+- Optional: `OPENAI_MODEL` — defaults to `gpt-4o-mini` if not set
+
+How to run locally (dev)
 
 1. git fetch origin
 2. git checkout -b scaffold/vite-react-ts origin/scaffold/vite-react-ts
 3. npm install
 4. npm run dev
 
-Migration plan (how to migrate existing React files into this scaffold)
+Open http://localhost:5173/chat to see the chatbot. If you want to use the OpenAI integration locally, set `OPENAI_API_KEY` in your environment and run a local environment that supports serverless functions (Vercel CLI `vercel dev` works well).
 
-1. Locate your current React/JSX/TSX source files in the repository. Common locations: src/, app/, public/ or top-level files.
-2. For each component/page, copy into the new src/ structure:
-   - Components -> src/components
-   - Pages -> src/pages
-   - Hooks -> src/hooks
-   - Context -> src/context
-3. Update imports in moved files to use relative paths from src/ (e.g., import Header from '../components/Header').
-4. If you have an existing entry file (index.tsx / index.jsx), replace its logic with src/main.tsx above or merge provider/wrapper code into UserProvider/BrowserRouter as appropriate.
-5. Run the app: npm run dev and verify Home (/) and About (/about) work.
+Security & notes
 
-PR draft (ready-to-open)
+- Never commit your OpenAI API key. Use Vercel's dashboard to set `OPENAI_API_KEY` for the project.
+- The serverless function simply proxies requests to OpenAI and returns the assistant reply. For public deployments consider adding rate-limiting or authentication to prevent abuse.
 
-Title: scaffold: Vite + React + TypeScript starter — add routing and UserContext
-
-Description:
-- Adds react-router routing (Home, About).
-- Adds a typed UserContext to hold profile data and demonstrate simple in-app editing.
-- Scaffolds a minimal Vite + React + TypeScript starter in branch scaffold/vite-react-ts.
-
-How to review:
-- Checkout the branch above and run the app locally.
-- Verify Home page shows avatar/name and the Edit profile flow works.
-- Navigate to /about and ensure the About page loads.
-
-Notes about deployment:
-- Vercel detects Vite apps automatically. Use build command `npm run build` and output directory `dist`.
-
-If you want, I can open the PR for you or make further changes (add more pages, migrate files found in the repo, or add CI).
+If you want, I can add optional features: streaming responses, server-side persistence of conversations, or authentication on the API endpoint.

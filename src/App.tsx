@@ -2,6 +2,7 @@ import React from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 import Home from './pages/Home'
 import About from './pages/About'
+import Chat from './pages/Chat'
 import './index.css'
 
 export default function App() {
@@ -11,6 +12,7 @@ export default function App() {
         <nav className="nav">
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/about" className="nav-link">About</Link>
+          <Link to="/chat" className="nav-link">Chat</Link>
         </nav>
         <h1>Profile</h1>
         <p>Welcome to your Vite + React + TypeScript profile app.</p>
@@ -20,6 +22,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/chat" element={<Chat />} />
         </Routes>
       </main>
 
