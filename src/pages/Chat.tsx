@@ -15,7 +15,7 @@ function formatTime(date = new Date()) {
 function generateBotReply(userText: string) {
   const text = userText.toLowerCase()
   if (/hi|hello|hey/.test(text)) return `Hello! How can I help you today?`
-  if (/help|how|what/.test(text)) return `You can ask me about this profile app: try "show profile", "edit bio", or simple greetings.`
+  if (/help|how|what/.test(text)) return `You can ask me about this profile app: try \"show profile\", \"edit bio\", or simple greetings.`
   if (/profile|bio|edit/.test(text)) return `This app stores a simple profile in React Context. Use the Home page to view and edit your bio.`
   const fallbacks = [
     `Interesting — tell me more!`,
@@ -43,20 +43,38 @@ export default function Chat() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  function postUserMessage(text: string) {
+  async function postUserMessage(text: string) {
     if (!text.trim()) return
     const msg: Message = { id: Date.now().toString() + Math.random().toString(36).slice(2), sender: 'user', text, time: formatTime() }
     setMessages((m) => [...m, msg])
     setInput('')
     setSending(true)
 
-    // simulate bot thinking
-    setTimeout(() => {
+    // Try server-side OpenAI proxy first
+    try {
+      const r = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text }),
+      })
+      const data = await r.json()
+      if (r.ok && data.reply) {
+        const botMsg: Message = { id: Date.now().toString() + Math.random().toString(36).slice(2), sender: 'bot', text: data.reply, time: formatTime() }
+        setMessages((m) => [...m, botMsg])
+      } else {
+        // fallback to local generator
+        const botText = generateBotReply(text)
+        const botMsg: Message = { id: Date.now().toString() + Math.random().toString(36).slice(2), sender: 'bot', text: botText, time: formatTime() }
+        setMessages((m) => [...m, botMsg])
+      }
+    } catch (err) {
+      console.error('Chat API error', err)
       const botText = generateBotReply(text)
       const botMsg: Message = { id: Date.now().toString() + Math.random().toString(36).slice(2), sender: 'bot', text: botText, time: formatTime() }
       setMessages((m) => [...m, botMsg])
+    } finally {
       setSending(false)
-    }, 800 + Math.random() * 700)
+    }
   }
 
   function onSubmit(e?: React.FormEvent) {
